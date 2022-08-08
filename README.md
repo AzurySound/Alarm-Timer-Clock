@@ -7,6 +7,13 @@ There is a packed exe file ATC_v1.2.4.exe available to download and run.
 ===========================
 ===========================
 
+Main.py uses tkinter and time frameworks, an original WindowsTimer class and functions to showcase the clock view, its formatting and additional settings and options
+WindowsTimer.py uses time framework and an original ClockHand class which provides the logic to calculate the desired time in different modes.
+ClockHand class is designed for time calculations within an OOP approach.
+
+===========================
+===========================
+
 When started a green transparent clock will be shown in the center of your screen.
 
 The clock is draggable and are on top of other windows
