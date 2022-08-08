@@ -2,10 +2,11 @@
 Welcome to ATC!
 
 The product is aimed to be an effective widject for micro time management.
+There is a packed exe file ATC_v1.2.4.exe available to download and run.
 
-
-
-
+=============================================================================
+=============================================================================
+=============================================================================
 
 When started a green transparent clock will be shown in the center of your screen.
 
@@ -16,8 +17,9 @@ There are 4 colors supported Green, Yellow, Blue and Pink #0FFF50, #FFFF00, #00F
 
 Transparency can be changed from 10% to 100% by the middle mouse button
 
-
-
+=============================================================================
+=============================================================================
+=============================================================================
 
 There's a menu available by the right mouse click:
 
@@ -39,8 +41,9 @@ Switches this exact menu option to Off top
 
 Close - closes the entire application
 
-
-
+=============================================================================
+=============================================================================
+=============================================================================
 
 Settings window:
 
@@ -59,5 +62,8 @@ When a mode is active it cannot be activated again until switched to another mod
 There's a 4th input field for your comment located at the bottom of ATC window.
 The commend is shown the next second you start typing in the field.
 
+=============================================================================
+=============================================================================
+=============================================================================
 
 I hope you enjoy the ATC app and manage the hell out of your time! 
