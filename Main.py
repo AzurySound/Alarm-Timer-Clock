@@ -108,7 +108,7 @@ def change_color():
 def open_timer_label():
     global Timer, font_size
     switch_timer()
-    WindowsTimer.ended = False
+    WindowsTimer.finished = False
     Timer = Label(root, font=("Digital-7", font_size), fg=color,
                   bg='#add123', width=width_r, height=height_r)
     Timer.bind("<Button-3>", do_popup)
@@ -117,7 +117,7 @@ def open_timer_label():
 def open_alarm_label():
     switch_alarm()
     global Alarm, font_size
-    WindowsTimer.ended = False
+    WindowsTimer.finished = False
     Alarm = Label(root, font=("Digital-7", font_size), fg=color,
                   bg='#add123', width=width_r, height=height_r)
     Alarm.bind("<Button-3>", do_popup)
@@ -413,11 +413,11 @@ def run_cap():
 def run_alarm():
     try:
         hms = get_user_Input()
-        text_input = WindowsTimer.substract_local_time_from(
+        text_input = WindowsTimer.get_countdown(
             hms[0], hms[1], hms[2])
         Alarm.config(text=text_input)
         Alarm.after(update_window, run_alarm)
-        if text_input == 'time':
+        if text_input == 'finished':
             open_cap()
     except:
         open_error()
@@ -426,11 +426,11 @@ def run_alarm():
 def run_timer():
     try:
         hms = get_user_Input()
-        text_input = WindowsTimer.substract_local_time_from(
+        text_input = WindowsTimer.get_countdown(
             timer_end_time[0], timer_end_time[1], timer_end_time[2])
         Timer.config(text=text_input)
         Timer.after(update_window, run_timer)
-        if text_input == 'time' or sum(hms) == 0:
+        if text_input == 'finished':# or sum(hms) == 0:
             open_cap()
     except:
         open_error()
