@@ -18,7 +18,7 @@ def add_current_time_to(h, m, s):
     minutes.advance(advanced_min)
     hours.advance(advanced_hour)
 
-    if minutes.get_value() > 0 and seconds.get_value() > 0:
+    if m > 0 and seconds.get_value() > 0:
         return hours.get_value(), minutes.get_value(), seconds.get_value() - 1
 
     return hours.get_value(), minutes.get_value(), seconds.get_value()
