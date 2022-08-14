@@ -369,7 +369,6 @@ def get_timer_end_time():
     timer_end_time = WindowsTimer.add_current_time_to(
         timer_end_time_list[0], timer_end_time_list[1], timer_end_time_list[2])
 
-
 def add_text():
     text_input = txt.get().lstrip().rstrip()
     Text.config(text=text_input)
@@ -456,6 +455,7 @@ root.mainloop()
 
 # python documents\timer\main.py
 # pyinstaller --onefile -w main.py
+# Alarm-Timer-Clock
 # https://www.pythontutorial.net/tkinter/tkinter-after/
 
 

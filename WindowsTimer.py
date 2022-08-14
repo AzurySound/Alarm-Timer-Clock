@@ -11,7 +11,7 @@ def add_current_time_to(h, m, s):
     minutes = ClockHand(60, time.localtime().tm_min)
     seconds = ClockHand(60, time.localtime().tm_sec)
 
-    advanced_sec = s
+    advanced_sec = s 
     advanced_min = m + seconds.extra_value(s)
     advanced_hour = h + minutes.extra_value(m)
 
@@ -19,6 +19,9 @@ def add_current_time_to(h, m, s):
     minutes.advance(advanced_min)
     hours.advance(advanced_hour)
 
+    if seconds.get_value() > 0:
+        return hours.get_value(), minutes.get_value(), seconds.get_value() - 1
+        
     return hours.get_value(), minutes.get_value(), seconds.get_value()
 
 
