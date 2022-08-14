@@ -1,45 +1,37 @@
-#from ast import openErr()
-from tkinter import *
+#from ast import open_error()
+from tkinter import IntVar, StringVar, Tk, Label, Menu, DISABLED, NORMAL, BOTTOM, Toplevel, Entry, Button
 import WindowsTimer
 import time
 # import missd
 
-# Known issues:
-# SOLVED 1) runTimer() method calculates difference between desired time and the current time every second
-# SOLVED 2) desired time is being set up only by pushing the timer button
-# whereas desired time should change right after changing values in user input fields
-# which leads to corrupted time difference when user inputs lesser time without pushing an appropriate button
-
-# 3) WindowsTimer.py should be rewritten with oop approach
-
-lastClickX = 0
-lastClickY = 0
-updateWindow = 1000
-clockFlag = True
-alarmFlag = False
-timerFlag = False
-capFlag = False
-geoFlag = True
-onTopFlag = True
-fontSize = 35
+last_click_x = 0
+last_click_y = 0
+update_window = 1000
+clock_flag = True
+alarm_flag = False
+timer_flag = False
+cap_flag = False
+geo_flag = True
+on_top_flag = True
+font_size = 35
 width_r = 40
 height_r = 15
 colors = ['#0FFF50','#FFFF00','#00FFFF','#FF00FF']
 color = colors[0]
 transparencies = [0.1, 0.3, 0.5, 0.7, 1]
 transparency = transparencies[1]
-timerEndTime = []
+timer_end_time = []
  # get the screen dimension
 
 # missd.sendMessage()
 
-def SaveLastClickPos(event):
-    global lastClickX, lastClickY
-    lastClickX = event.x
-    lastClickY = event.y
+def save_last_click_pos(event):
+    global last_click_x, last_click_y
+    last_click_x = event.x
+    last_click_y = event.y
 
-def Dragging(event):
-    x, y = event.x - lastClickX + root.winfo_x(), event.y - lastClickY + root.winfo_y()
+def dragging(event):
+    x, y = event.x - last_click_x + root.winfo_x(), event.y - last_click_y + root.winfo_y()
     root.geometry("+%s+%s" % (x , y))
 
 def do_popup(event):
@@ -48,7 +40,7 @@ def do_popup(event):
     finally:
         m.grab_release()
 
-def findScreenCenter(screen_size, win_size):
+def find_screen_center(screen_size, win_size):
     return int(screen_size/2 - win_size/2)
 
 root = Tk()
@@ -58,10 +50,10 @@ root_width = 170
 root_height = 86
 root_big_width = 1400
 root_big_height = 600
-center_x = findScreenCenter(screen_width, root_width)
-center_y = findScreenCenter(screen_height, root_height)
-big_center_x = findScreenCenter(screen_width, root_big_width)
-big_center_y = findScreenCenter(screen_height, root_big_height)
+center_x = find_screen_center(screen_width, root_width)
+center_y = find_screen_center(screen_height, root_height)
+big_center_x = find_screen_center(screen_width, root_big_width)
+big_center_y = find_screen_center(screen_height, root_big_height)
 
 root.overrideredirect(True)
 root.attributes('-alpha', 0.3, '-topmost', True)
@@ -80,12 +72,12 @@ min.set(0)
 sec.set(0)
 txt.set(' ')
 
-root.bind('<Button-1>', SaveLastClickPos)
-root.bind('<B1-Motion>', Dragging)
-root.bind('<Double-Button-1>', lambda e: changeColor())
-root.bind('<Button-2>', lambda e: switchTransp())
+root.bind('<Button-1>', save_last_click_pos)
+root.bind('<B1-Motion>', dragging)
+root.bind('<Double-Button-1>', lambda e: change_color())
+root.bind('<Button-2>', lambda e: switch_transparency())
 
-def switchTransp():
+def switch_transparency():
     global transparency
     transNum = transparencies.index(transparency)
     transNum += 1
@@ -94,209 +86,209 @@ def switchTransp():
     transparency = transparencies[transNum]
     root.attributes('-alpha', transparency)
     
-def changeColor():
+def change_color():
     global color
     colorNum = colors.index(color)
     colorNum += 1
     if colorNum == len(colors):
         colorNum = 0
     color = colors[colorNum]
-    resetView()
+    reset_view()
 
-def oTimer():
-    global Timer, fontSize
-    timerSwitch()
+def open_timer_label():
+    global Timer, font_size
+    switch_timer()
     WindowsTimer.ended = False
-    Timer = Label(root, font=("Digital-7", fontSize), fg=color, bg='#add123', width=width_r, height=height_r)
+    Timer = Label(root, font=("Digital-7", font_size), fg=color, bg='#add123', width=width_r, height=height_r)
     Timer.bind("<Button-3>", do_popup)
 
-def oAlarm():
-    alarmSwitch()
-    global Alarm, fontSize
+def open_alarm_label():
+    switch_alarm()
+    global Alarm, font_size
     WindowsTimer.ended = False
-    Alarm = Label(root, font=("Digital-7", fontSize), fg=color, bg='#add123', width=width_r, height=height_r)
+    Alarm = Label(root, font=("Digital-7", font_size), fg=color, bg='#add123', width=width_r, height=height_r)
     Alarm.bind("<Button-3>", do_popup)
 
-def oClock():
-    clockSwitch()
-    global Clock, fontSize
-    Clock = Label(root, font=("Digital-7", fontSize), fg=color, bg='#add123', width=width_r, height=height_r)
+def open_clock_label():
+    switch_clock()
+    global Clock, font_size
+    Clock = Label(root, font=("Digital-7", font_size), fg=color, bg='#add123', width=width_r, height=height_r)
     Clock.bind("<Button-3>", do_popup)
 
-def oCap():
-    capSwitch()
-    global Cap, fontSize
-    Cap = Label(root, font=("Digital-7", fontSize), fg='#000', bg='#FFF', width=width_r, height=height_r)
+def open_cap_label():
+    switch_cap()
+    global Cap, font_size
+    Cap = Label(root, font=("Digital-7", font_size), fg='#000', bg='#FFF', width=width_r, height=height_r)
     Cap.bind("<Button-3>", do_popup)
 
-Text = Label(root, font=("Digital-7", int(fontSize * 0.5)), text=txt.get(), fg=color, bg='#add123', width=width_r)
+Text = Label(root, font=("Digital-7", int(font_size * 0.5)), text=txt.get().lstrip().rstrip(), fg=color, bg='#add123', width=width_r)
 Text.bind("<Button-3>", do_popup)
 
 
 m = Menu(root, tearoff=0)
-m.add_command(label="Settings", command = lambda: openNewwin())
-m.add_command(label="Clock", command = lambda: turnClockIfCan())
-m.add_command(label="Bigger", command = lambda: changeGeo())
-m.add_command(label="Off top", command = lambda: switchOnTop())
+m.add_command(label="Settings", command = lambda: open_new_window())
+m.add_command(label="Clock", command = lambda: turn_clock_on_if_can())
+m.add_command(label="Bigger", command = lambda: change_geoposition())
+m.add_command(label="Off top", command = lambda: switch_on_top())
 m.add_command(label="Close", command = root.destroy)
 
-def turnClockIfCan():
-    if not clockFlag:
-        clockSwitch(), openClock()
+def turn_clock_on_if_can():
+    if not clock_flag:
+        switch_alarm(), open_clock()
 
-def switchOnTop():
-    global onTopFlag
-    if not onTopFlag:
+def switch_on_top():
+    global on_top_flag
+    if not on_top_flag:
         root.attributes('-topmost', True)
         m.entryconfigure(3, label="Off top")
-        onTopFlag = True
+        on_top_flag = True
     else:
         root.attributes('-topmost', False)
         m.entryconfigure(3, label="On top")
-        onTopFlag = False
+        on_top_flag = False
 
-def changeGeo():
-    if geoFlag:
+def change_geoposition():
+    if geo_flag:
         bigger()
     else:
         smaller()
 
-def resetView():
+def reset_view():
 
     Text.config(fg=color)
 
-    if clockFlag:
+    if clock_flag:
         Clock.destroy()
-        oClock()
+        open_clock_label()
         Clock.pack()
-        runClock()
+        run_clock()
 
-    elif alarmFlag:
+    elif alarm_flag:
         Alarm.destroy() 
-        oAlarm()
+        open_alarm_label()
         Alarm.pack()
-        runAlarm()
+        run_alarm()
 
-    elif capFlag:
+    elif cap_flag:
         Cap.destroy() 
-        oCap()
+        open_cap_label()
         Cap.pack()
-        runCap()
+        run_cap()
 
     else:
         Timer.destroy() 
-        oTimer()
+        open_timer_label()
         Timer.pack()
-        runTimer()
+        run_timer()
 
 def smaller():
-    global geoFlag, fontSize, width_r, height_r
+    global geo_flag, font_size, width_r, height_r
     m.entryconfigure(2, label="Bigger")
-    if not onTopFlag:
-        switchOnTop()
-    fontSize = 35
+    if not on_top_flag:
+        switch_on_top()
+    font_size = 35
     width_r = 40
     height_r = 15
-    Text.config(font=("Digital-7", int(fontSize * 0.5)), width=width_r)
-    resetView()
+    Text.config(font=("Digital-7", int(font_size * 0.5)), width=width_r)
+    reset_view()
     root.geometry(f'{root_width}x{root_height}+{center_x}+{center_y}')
-    geoFlag = True
+    geo_flag = True
 
 def bigger():
-    global geoFlag, fontSize, width_r, height_r
+    global geo_flag, font_size, width_r, height_r
     m.entryconfigure(2, label="Smaller")
-    if onTopFlag:
-        switchOnTop()
-    fontSize = 290
+    if on_top_flag:
+        switch_on_top()
+    font_size = 290
     width_r = 170
     height_r = 33
-    Text.config(font=("Digital-7", int(fontSize * 0.5)), width=width_r)
-    resetView()
+    Text.config(font=("Digital-7", int(font_size * 0.5)), width=width_r)
+    reset_view()
     root.geometry(f'{root_big_width}x{root_big_height}+{big_center_x}+{big_center_y}')
-    geoFlag = False
+    geo_flag = False
 
-def openErr():
+def open_error():
     try:
         Timer.destroy()
         Alarm.destroy()
         Clock.destroy()
-        oCap()
+        open_cap_label()
         Cap.pack()
-        runErr()
+        run_error()
     except: pass
 
-def openCap():
+def open_cap():
     try:
         Timer.destroy()
         Alarm.destroy()
-        oCap()
+        open_cap_label()
         Cap.pack()
-        runCap()
-    except: openErr()
+        run_cap()
+    except: open_error()
 
-def openClock():
+def open_clock():
     try:
         Timer.destroy()
         Alarm.destroy() 
         Cap.destroy()
-        oClock()
+        open_clock_label()
         Clock.pack()
-        runClock()
-    except: openErr()
+        run_clock()
+    except: open_error()
 
-def openAlarm():
+def open_alarm():
     try:
-        oAlarm()
+        open_alarm_label()
         Timer.destroy()
         #WindowsTimer.receiveStartTime(time.localtime().tm_hour, time.localtime().tm_min, time.localtime().tm_sec)
         Clock.destroy()
         Cap.destroy()
         Alarm.pack()
-        runAlarm()
-    except: openErr()
+        run_alarm()
+    except: open_error()
 
-def openTimer():
+def open_timer():
     try:
-        getTimerEndTime()
-        oTimer()
+        get_timer_end_time()
+        open_timer_label()
         Clock.destroy()
         Cap.destroy()
         Alarm.destroy()
         Timer.pack()
-        runTimer()
-    except: openErr()
+        run_timer()
+    except: open_error()
     
-def clockSwitch():
-    global clockFlag, alarmFlag, timerFlag, capFlag
-    clockFlag, alarmFlag, timerFlag, capFlag = True, False, False, False
+def switch_clock():
+    global clock_flag, alarm_flag, timer_flag, cap_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag = True, False, False, False
 
-def alarmSwitch():    
-    global clockFlag, alarmFlag, timerFlag, capFlag
-    clockFlag, alarmFlag, timerFlag, capFlag = False, True, False, False
+def switch_alarm():    
+    global clock_flag, alarm_flag, timer_flag, cap_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag = False, True, False, False
 
-def timerSwitch():        
-    global clockFlag, alarmFlag, timerFlag, capFlag
-    clockFlag, alarmFlag, timerFlag, capFlag = False, False, True, False
+def switch_timer():        
+    global clock_flag, alarm_flag, timer_flag, cap_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag = False, False, True, False
 
-def capSwitch():        
-    global clockFlag, alarmFlag, timerFlag, capFlag
-    clockFlag, alarmFlag, timerFlag, capFlag = False, False, False, True
+def switch_cap():        
+    global clock_flag, alarm_flag, timer_flag, cap_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag = False, False, False, True
       
 
-def openNewwin():
+def open_new_window():
     
-    def btnSet():
-        if clockFlag:
+    def btn_set():
+        if clock_flag:
             clockBtn['state'] = DISABLED
             alarmBtn['state'] = NORMAL
             timerBtn['state'] = NORMAL
 
-        if alarmFlag:
+        if alarm_flag:
             alarmBtn['state'] = DISABLED
             clockBtn['state'] = NORMAL
             timerBtn['state'] = NORMAL
 
-        if timerFlag:
+        if timer_flag:
             timerBtn['state'] = DISABLED
             alarmBtn['state'] = NORMAL
             clockBtn['state'] = NORMAL
@@ -321,27 +313,27 @@ def openNewwin():
     Entry(newwin,textvariable = txt, width = 24).place(x=45,y=83)
 
 
-    clockBtn = Button(newwin, text = "Clock", width = 7, command = lambda: [clockSwitch(), btnSet(), openClock()])
-    alarmBtn = Button(newwin, text = "Alarm", width = 7, command = lambda: [alarmSwitch(), btnSet(), openAlarm()])
-    timerBtn = Button(newwin, text = "Timer", width = 7, command = lambda: [timerSwitch(), btnSet(), openTimer()])
-    btnSet()
+    clockBtn = Button(newwin, text = "Clock", width = 7, command = lambda: [switch_clock(), btn_set(), open_clock()])
+    alarmBtn = Button(newwin, text = "Alarm", width = 7, command = lambda: [switch_alarm(), btn_set(), open_alarm()])
+    timerBtn = Button(newwin, text = "Timer", width = 7, command = lambda: [switch_timer(), btn_set(), open_timer()])
+    btn_set()
 
     clockBtn.place(x=20,y=110)
     alarmBtn.place(x=90,y=110)
     timerBtn.place(x=160,y=110)
 
-def getTimerEndTime():
-    global timerEndTime
-    timerEndTimeList = getUserInput()
-    timerEndTime = WindowsTimer.calculatedTimeEnd(timerEndTimeList[0], timerEndTimeList[1], timerEndTimeList[2])
+def get_timer_end_time():
+    global timer_end_time
+    timer_end_time_list = get_user_Input()
+    timer_end_time = WindowsTimer.add_current_time_to(timer_end_time_list[0], timer_end_time_list[1], timer_end_time_list[2])
 
-def addText():
-    text_input = txt.get()
+def add_text():
+    text_input = txt.get().lstrip().rstrip()
     Text.config(text = text_input)
     Text.pack(side=BOTTOM)
-    Text.after(1000, addText)
+    Text.after(1000, add_text)
 
-def getUserInput():
+def get_user_Input():
     try: h = hour.get()
     except: h = 0
     try: m = min.get()
@@ -350,54 +342,56 @@ def getUserInput():
     except: s = 0
     return h, m, s
 
-def runErr():
+def run_error():
     Cap.config(text = "ERROR")
     if time.localtime().tm_sec % 2 == 0:
         Cap.config(fg='#F00', bg='#add123')
     else: Cap.config(fg='#FFF', bg='#add123')
-    Cap.after(1000, runErr)
+    Cap.after(1000, run_error)
 
-def runCap():
+def run_cap():
     Cap.config(text = "time")
     if time.localtime().tm_sec % 2 == 0:
         Cap.config(fg='#FFF', bg='#000')
     else: Cap.config(fg='#000', bg='#FFF')
-    Cap.after(1000, runCap)
+    Cap.after(1000, run_cap)
 
-def runAlarm():
+def run_alarm():
     try:
-        hms = getUserInput()
-        text_input = WindowsTimer.substractLocalTimeFrom(hms[0],hms[1],hms[2])
-        # Alarm.config(text = text_input[0:-3])
+        hms = get_user_Input()
+        text_input = WindowsTimer.substract_local_time_from(hms[0], hms[1] - 1, hms[2])
+        # line above [hms[1] - 1] is a crutch here since the goal is to show minutes left rounded to upper value
+        # the method substract_local_time_from() is changed holding that in mind
+        # Alarm.config(text = text_input[0:-3]) 
         Alarm.config(text = text_input)
-        Alarm.after(updateWindow, runAlarm)
+        Alarm.after(update_window, run_alarm)
         if text_input == 'time':
-            openCap()
-    except:  openErr()
+            open_cap()
+    except:  open_error()
 
-def runTimer():
+def run_timer():
     try:
-        hms = getUserInput()
-        text_input = WindowsTimer.substractLocalTimeFrom(timerEndTime[0],timerEndTime[1],timerEndTime[2])
+        hms = get_user_Input()
+        text_input = WindowsTimer.substract_local_time_from(timer_end_time[0],timer_end_time[1],timer_end_time[2])
         # Timer.config(text = text_input[0:-3])
         Timer.config(text = text_input)
-        Timer.after(updateWindow, runTimer)
-        if text_input == 'time' or hms[0] == 0 and hms[1] == 0 and hms[2] == 0:
-            openCap()
-    except:  openErr()
+        Timer.after(update_window, run_timer)
+        if text_input == 'time' or sum(hms) == 0:
+            open_cap()
+    except:  open_error()
 
-def runClock():
+def run_clock():
     try:
-        text_input = WindowsTimer.showClock()
+        text_input = time.strftime("%H:%M", time.localtime())
         Clock.config(text = text_input)
-        Clock.after(updateWindow, runClock)
-    except: openErr()
+        Clock.after(update_window, run_clock)
+    except: open_error()
 
-oTimer()
-oAlarm()
-oCap()
-openClock()
-addText()
+open_timer_label()
+open_alarm_label()
+open_cap_label()
+open_clock()
+add_text()
 root.mainloop()
 
 
