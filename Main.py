@@ -1,11 +1,16 @@
-# from ast import open_error()
 import time
 from tkinter import (BOTTOM, DISABLED, NORMAL, Button, Entry, IntVar, Label,
                      Menu, StringVar, Tk, Toplevel)
 
 import WindowsTimer
+import Settings
+import logging
+
 
 # import missd
+# to do list:
+# make a class for a toplevel window
+# make a class for a root window
 
 last_click_x = 0
 last_click_y = 0
@@ -13,6 +18,7 @@ update_window = 1000
 clock_flag = True
 alarm_flag = False
 timer_flag = False
+stopwatch_flag = False
 cap_flag = False
 geo_flag = True
 on_top_flag = True
@@ -24,8 +30,11 @@ color = colors[0]
 transparencies = [0.1, 0.3, 0.5, 0.7, 1]
 transparency = transparencies[1]
 timer_end_time = []
+start_time = []
+txt_log_var = ''
 
 # missd.sendMessage()
+
 
 def save_last_click_pos(event):
     global last_click_x, last_click_y
@@ -62,6 +71,7 @@ center_y = find_screen_center(screen_height, root_height)
 big_center_x = find_screen_center(screen_width, root_big_width)
 big_center_y = find_screen_center(screen_height, root_big_height)
 
+
 root.overrideredirect(True)
 root.attributes('-alpha', 0.3, '-topmost', True)
 root.wm_attributes('-transparentcolor', '#add123')
@@ -69,10 +79,19 @@ root.geometry(f'{root_width}x{root_height}+{center_x}+{center_y}')
 root.eval('tk::PlaceWindow . center')
 # root.resizable(1,1)
 
+
 hour = IntVar()
 min = IntVar()
 sec = IntVar()
 txt = StringVar()
+
+
+def log_txt(new_txt):
+    global txt_log_var
+    if txt_log_var != new_txt:
+        txt_log_var = new_txt
+        logging.info('Text updated: "{}"'.format(txt_log_var))
+
 
 hour.set(0)
 min.set(0)
@@ -113,6 +132,14 @@ def open_timer_label():
                   bg='#add123', width=width_r, height=height_r)
     Timer.bind("<Button-3>", do_popup)
 
+# def open_stopwatch_label():
+#     global Stopwatch, font_size
+#     switch_stopwatch()
+#     WindowsTimer.finished = False
+#     Stopwatch = Label(root, font=("Digital-7", font_size), fg=color,
+#                   bg='#add123', width=width_r, height=height_r)
+#     Stopwatch.bind("<Button-3>", do_popup)
+
 
 def open_alarm_label():
     switch_alarm()
@@ -146,15 +173,32 @@ Text.bind("<Button-3>", do_popup)
 
 m = Menu(root, tearoff=0)
 m.add_command(label="Settings", command=lambda: open_new_window())
+# m.add_command(label="Stopwatch", command=lambda: turn_on_stopwatch_if_can())
 m.add_command(label="Clock", command=lambda: turn_clock_on_if_can())
 m.add_command(label="Bigger", command=lambda: change_geoposition())
 m.add_command(label="Off top", command=lambda: switch_on_top())
-m.add_command(label="Close", command=root.destroy)
+m.add_command(label="Close", command=lambda: destroy())
+
+
+def destroy():
+    logging.info('Closing the instance with text: "{}"'.format(txt_log_var))
+    root.destroy()
+
+# this func is not rdy and should be properly tested. use open_new_window() instead
+
+
+def open_settings():
+    Settings(root)
 
 
 def turn_clock_on_if_can():
     if not clock_flag:
         switch_alarm(), open_clock()
+
+# def turn_on_stopwatch_if_can():
+#     get_start_time()
+#     if not stopwatch_flag:
+#         open_stopwatch()
 
 
 def switch_on_top():
@@ -198,6 +242,12 @@ def reset_view():
         Cap.pack()
         run_cap()
 
+    # elif stopwatch_flag:
+    #     Stopwatch.destroy()
+    #     open_cap_label()
+    #     Cap.pack()
+    #     run_cap()
+
     else:
         Timer.destroy()
         open_timer_label()
@@ -238,11 +288,13 @@ def open_error():
     try:
         Timer.destroy()
         Alarm.destroy()
+        # Stopwatch.destroy()
         Clock.destroy()
         open_cap_label()
         Cap.pack()
         run_error()
-    except:
+    except Exception as e:
+        logging.error(e)
         pass
 
 
@@ -250,10 +302,12 @@ def open_cap():
     try:
         Timer.destroy()
         Alarm.destroy()
+        # Stopwatch.destroy()
         open_cap_label()
         Cap.pack()
         run_cap()
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
 
 
@@ -262,10 +316,12 @@ def open_clock():
         Timer.destroy()
         Alarm.destroy()
         Cap.destroy()
+        # Stopwatch.destroy()
         open_clock_label()
         Clock.pack()
         run_clock()
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
 
 
@@ -275,9 +331,11 @@ def open_alarm():
         Timer.destroy()
         Clock.destroy()
         Cap.destroy()
+        # Stopwatch.destroy()
         Alarm.pack()
         run_alarm()
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
 
 
@@ -287,57 +345,80 @@ def open_timer():
         open_timer_label()
         Clock.destroy()
         Cap.destroy()
+        # Stopwatch.destroy()
         Alarm.destroy()
         Timer.pack()
         run_timer()
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
+
+# def open_stopwatch():
+#     try:
+#         open_stopwatch_label()
+#         Clock.destroy()
+#         Cap.destroy()
+#         Alarm.destroy()
+#         Timer.destroy()
+#         Stopwatch.pack()
+#         run_stopwatch()
+#     except Exception as e:
+#         logging.error(e)
+#         open_error()
 
 
 def switch_clock():
-    global clock_flag, alarm_flag, timer_flag, cap_flag
-    clock_flag, alarm_flag, timer_flag, cap_flag = True, False, False, False
+    global clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag = True, False, False, False, False
 
 
 def switch_alarm():
-    global clock_flag, alarm_flag, timer_flag, cap_flag
-    clock_flag, alarm_flag, timer_flag, cap_flag = False, True, False, False
+    global clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag = False, True, False, False, False
 
 
 def switch_timer():
-    global clock_flag, alarm_flag, timer_flag, cap_flag
-    clock_flag, alarm_flag, timer_flag, cap_flag = False, False, True, False
+    global clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag = False, False, True, False, False
+
+# def switch_stopwatch():
+#     global clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag
+#     clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag = False, False, False, False, True
 
 
 def switch_cap():
-    global clock_flag, alarm_flag, timer_flag, cap_flag
-    clock_flag, alarm_flag, timer_flag, cap_flag = False, False, False, True
+    global clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag
+    clock_flag, alarm_flag, timer_flag, cap_flag, stopwatch_flag = False, False, False, True, False
 
 
 def open_new_window():
 
     def btn_set():
+
         if clock_flag:
             clockBtn['state'] = DISABLED
             alarmBtn['state'] = NORMAL
             timerBtn['state'] = NORMAL
+            logging.info('Pushed btn clockBtn')
 
         if alarm_flag:
             alarmBtn['state'] = DISABLED
             clockBtn['state'] = NORMAL
             timerBtn['state'] = NORMAL
+            logging.info('Pushed btn alarmBtn')
 
         if timer_flag:
             timerBtn['state'] = DISABLED
             alarmBtn['state'] = NORMAL
             clockBtn['state'] = NORMAL
+            logging.info('Pushed btn timerBtn')
 
     window_width = 240
     window_height = 145
 
     # find the center point
-    center_x = int(screen_width/2 - window_width / 2)
-    center_y = int(screen_height/2 - window_height / 2)
+    center_x = find_screen_center(screen_width, root_width)
+    center_y = find_screen_center(screen_height, root_height)
 
     newwin = Toplevel(root)
     newwin.title("Settings")
@@ -363,14 +444,22 @@ def open_new_window():
     timerBtn.place(x=160, y=110)
 
 
+def get_start_time():
+    global start_time
+    start_time = [time.localtime().tm_hour, time.localtime().tm_min,
+                  time.localtime().tm_sec]
+
+
 def get_timer_end_time():
     global timer_end_time
     timer_end_time_list = get_user_Input()
     timer_end_time = WindowsTimer.add_current_time_to(
         timer_end_time_list[0], timer_end_time_list[1], timer_end_time_list[2])
 
+
 def add_text():
     text_input = txt.get().lstrip().rstrip()
+    log_txt(text_input)
     Text.config(text=text_input)
     Text.pack(side=BOTTOM)
     Text.after(1000, add_text)
@@ -379,16 +468,20 @@ def add_text():
 def get_user_Input():
     try:
         h = hour.get()
-    except:
+    except Exception as e:
+        logging.debug(e)
         h = 0
     try:
         m = min.get()
-    except:
+    except Exception as e:
+        logging.debug(e)
         m = 0
     try:
         s = sec.get()
-    except:
+    except Exception as e:
+        logging.debug(e)
         s = 0
+    logging.debug('Entry: {}:{}:{}'.format(h, m, s))
     return h, m, s
 
 
@@ -419,21 +512,40 @@ def run_alarm():
         Alarm.after(update_window, run_alarm)
         if text_input == 'finished':
             open_cap()
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
 
 
 def run_timer():
     try:
-        hms = get_user_Input()
-        text_input = WindowsTimer.get_countdown(
-            timer_end_time[0], timer_end_time[1], timer_end_time[2])
+        user_input = get_user_Input()
+
+        if user_input == (0, 0, 0):
+            text_input = WindowsTimer.stopwatch(
+                timer_end_time[0], timer_end_time[1], timer_end_time[2])
+        else:
+            text_input = WindowsTimer.get_countdown(
+                timer_end_time[0], timer_end_time[1], timer_end_time[2])
+
         Timer.config(text=text_input)
         Timer.after(update_window, run_timer)
-        if text_input == 'finished':# or sum(hms) == 0:
+        if text_input == 'finished':  # or sum(hms) == 0:
             open_cap()
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
+
+# def run_stopwatch():
+#     try:
+#         text_input = WindowsTimer.stopwatch(start_time[0], start_time[1], start_time[2])
+#         if isinstance(text_input, str):
+#             print('YES ' + text_input)
+#         Timer.config(text=text_input)
+#         Timer.after(update_window, run_timer)
+#     except Exception as e:
+#         logging.error(e)
+#         open_error()
 
 
 def run_clock():
@@ -441,11 +553,13 @@ def run_clock():
         text_input = time.strftime("%H:%M", time.localtime())
         Clock.config(text=text_input)
         Clock.after(update_window, run_clock)
-    except:
+    except Exception as e:
+        logging.error(e)
         open_error()
 
 
 open_timer_label()
+# open_stopwatch_label()
 open_alarm_label()
 open_cap_label()
 open_clock()
