@@ -6,7 +6,7 @@ There is a packed exe file available to download and run.
 
 The code is distributed between 3 .py files:
 ### Main.py
-At that stage Main.py could use refactoring and should be splitted into separated classes removing a bunch of global variables and increasing readability. I used the following frameworks there: tkinter and time, an original WindowsTimer class and functions to showcase the clock view.
+At that stage Main.py could use refactoring and should be splitted into separated classes removing a bunch of global variables and increasing readability. I used the following frameworks there: tkinter and time, calculation methods and functions from WIndowsTimer.py file to showcase the accurate clock view.
 ### WindowsTimer.py
 WindowsTimer.py uses time framework and an original ClockHand class which provides the logic to calculate the desired time in different modes.
 ### ClockHand.py
