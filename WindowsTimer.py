@@ -111,14 +111,16 @@ def stopwatch(h, m, s):
     timer = time_diff(time.localtime().tm_hour,
                      time.localtime().tm_min, time.localtime().tm_sec, h, m, s)
 
+    minutes = ClockHand(60, timer[1])
+
     if timer[0] == 0:
         if timer[2] < 6 or timer[2] > 54:
             logging.info('Output time: "{}:{}"'.format(timer[1], timer[2]))
-        return (f'{timer[1]}')
+        return (f'{minutes.get_value()}')
 
     if timer[2] < 6 or timer[2] > 54:
         logging.info('Output time: "{}:{}:{}"'.format(timer[0], timer[1], timer[2]))
-    return (f'{timer[0]}:{timer[1]}')
+    return (f'{timer[0]}:{minutes}')
 
 
 # OUTDATED DUE TO time_diff() func
