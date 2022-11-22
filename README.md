@@ -1,61 +1,42 @@
 # Alarm-Timer-Clock
-Welcome to ATC!
+## Welcome to ATC!
 
 The product is aimed to be an effective widject for micro time management.
-There is a packed exe file ATC_v1.2.4.exe available to download and run.
+There is a packed exe file available to download and run.
 
-===========================
-===========================
-
-Main.py uses tkinter and time frameworks, an original WindowsTimer class and functions to showcase the clock view, its formatting and additional settings and options
-
+The code is distributed between 3 .py files:
+### Main.py
+At that stage Main.py could use refactoring and should be splitted into separated classes removing a bunch of global variables and increasing readability. I used the following frameworks there: tkinter and time, an original WindowsTimer class and functions to showcase the clock view.
+### WindowsTimer.py
 WindowsTimer.py uses time framework and an original ClockHand class which provides the logic to calculate the desired time in different modes.
-
+### ClockHand.py
 ClockHand class is designed for time calculations within an OOP approach.
 
-===========================
-===========================
 
-When started a green transparent clock will be shown in the center of your screen.
 
-The clock is draggable and are on top of other windows
 
-The color can be changed by a double click on the clock
-There are 4 colors supported Green, Yellow, Blue and Pink #0FFF50, #FFFF00, #00FFFF, #FF00FF
 
-Transparency can be changed from 10% to 100% by the middle mouse button
+---------------------------
+## Options
+After start the clock is shown. It is draggable and can be set as an Alarm, Timer and Stopwatch that shows only minutes and hours. 
+There are few options in the dropdown menu:
+1. User can choose the size of the clock **smaller/bigger**
+2. **The color** of the digits can be changed with a double click on them 
+3. **The font** of the digits can be changed by picking the Font option in the dropdown menu
+4. User can change whether to show the clock **on top** of the desktop or **off top** (by default bigger size is off and smaller size is on)
+5. User can change the **transparency** with a middle mouse click on the clock
+6. In the settings menu **a note** can be added to the clock
+7. User can switch back to **the clock view any time** with the clock option in the dropdown menu. (it's a shortcut to avoid opening settings window)
+To set up an Alarm, Timer and Stopwatch
+there's a settings menu available in the dropdown menu:
+---------------------------
 
-===========================
-===========================
+## Settings menu:
 
-There's a menu available by the right mouse click:
-
-Settings - Opens a settings window (for more details please read Settings window block)
-
-Clock - Switches to the clock mode if the clock mode is not active (Timer or Alarm are shown) 
-
-Bigger - makes the clock bigger and to be off top of your windows.
-Switches this exact menu option to Smaller
-
-Smaller - makes the clock smaller and to be on top of your windows.
-Switches this exact menu option to Smaller
-
-Off top - makes the clock to be off top of your windows.
-Switches this exact menu option to On top
-
-On top - makes the clock to be on top of your windows.
-Switches this exact menu option to Off top
-
-Close - closes the entire application
-
-===========================
-===========================
-
-Settings window:
-
-There is a short hint on what are alarm and timer for:
+There is a short hint on what are Alarm, Timer and Stopwatch for:
 Alarm counts down to the exact time that has been put in the input fields
 Timer counts down an exact time that has been put in the input fields
+Stopwatch is activated by a Timer button if all the fields left empty or fulfilled with zeros
 
 There are 3 input fields:
 Hours   Minutes   Seconds
@@ -68,7 +49,6 @@ When a mode is active it cannot be activated again until switched to another mod
 There's a 4th input field for your comment located at the bottom of ATC window.
 The commend is shown the next second you start typing in the field.
 
-===========================
-===========================
+---------------------------
 
-I hope you enjoy the ATC app and manage the hell out of your time! 
+I wish you enjoy the ATC app and manage your time wisely! 
