@@ -25,13 +25,18 @@ on_top_flag = True
 font_size = 35
 width_r = 40
 height_r = 15
-colors = ['#0FFF50', '#FFFF00', '#00FFFF', '#FF00FF']
+font_names = ['Technology', 'FFF Forward']
+# ['open 24 Display St', 'digital-7','Technology', 'Fake Hope', 'Berlin Sans FB', 'FFF Forward']
+font_name = font_names[0]
+colors = ['#FFFFFF', '#44FF44','#FFFF88', '#444FFF', '#FF4444']
 color = colors[0]
 transparencies = [0.1, 0.3, 0.5, 0.7, 1]
 transparency = transparencies[1]
 timer_end_time = []
 start_time = []
 txt_log_var = ''
+
+
 
 # missd.sendMessage()
 
@@ -62,10 +67,10 @@ def find_screen_center(screen_size, win_size):
 root = Tk()
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
-root_width = 170
-root_height = 86
-root_big_width = 1400
-root_big_height = 600
+root_width = int(170 * 1)
+root_height = int(86 * 1)
+root_big_width = int(1400 * 1)
+root_big_height = int(600 * 1)
 center_x = find_screen_center(screen_width, root_width)
 center_y = find_screen_center(screen_height, root_height)
 big_center_x = find_screen_center(screen_width, root_big_width)
@@ -123,12 +128,21 @@ def change_color():
     color = colors[colorNum]
     reset_view()
 
+def change_font():
+    global font_name
+    colorNum = font_names.index(font_name)
+    colorNum += 1
+    if colorNum == len(font_names):
+        colorNum = 0
+    font_name = font_names[colorNum]
+    reset_view()
+
 
 def open_timer_label():
     global Timer, font_size
     switch_timer()
     WindowsTimer.finished = False
-    Timer = Label(root, font=("Digital-7", font_size), fg=color,
+    Timer = Label(root, font=(font_name, font_size), fg=color,
                   bg='#add123', width=width_r, height=height_r)
     Timer.bind("<Button-3>", do_popup)
 
@@ -136,7 +150,7 @@ def open_timer_label():
 #     global Stopwatch, font_size
 #     switch_stopwatch()
 #     WindowsTimer.finished = False
-#     Stopwatch = Label(root, font=("Digital-7", font_size), fg=color,
+#     Stopwatch = Label(root, font=(font_name, font_size), fg=color,
 #                   bg='#add123', width=width_r, height=height_r)
 #     Stopwatch.bind("<Button-3>", do_popup)
 
@@ -145,7 +159,7 @@ def open_alarm_label():
     switch_alarm()
     global Alarm, font_size
     WindowsTimer.finished = False
-    Alarm = Label(root, font=("Digital-7", font_size), fg=color,
+    Alarm = Label(root, font=(font_name, font_size), fg=color,
                   bg='#add123', width=width_r, height=height_r)
     Alarm.bind("<Button-3>", do_popup)
 
@@ -153,7 +167,7 @@ def open_alarm_label():
 def open_clock_label():
     switch_clock()
     global Clock, font_size
-    Clock = Label(root, font=("Digital-7", font_size), fg=color,
+    Clock = Label(root, font=(font_name, font_size), fg=color,
                   bg='#add123', width=width_r, height=height_r)
     Clock.bind("<Button-3>", do_popup)
 
@@ -161,15 +175,20 @@ def open_clock_label():
 def open_cap_label():
     switch_cap()
     global Cap, font_size
-    Cap = Label(root, font=("Digital-7", font_size), fg='#000',
-                bg='#FFF', width=width_r, height=height_r)
+    Cap = Label(root, font=(font_name, font_size), fg='#000',bg='#FFF', width=width_r, height=height_r)
     Cap.bind("<Button-3>", do_popup)
 
-
-Text = Label(root, font=("Digital-7", int(font_size * 0.5)),
-             text=txt.get().lstrip().rstrip(), fg=color, bg='#add123', width=width_r)
+Text = Label(root, font=('Berlin Sans FB', int(font_size * 0.4)),
+            text=txt.get().lstrip().rstrip(), fg=color, bg='#add123', width=width_r)
 Text.bind("<Button-3>", do_popup)
 
+
+def add_text():
+    text_input = txt.get().lstrip().rstrip()
+    log_txt(text_input)
+    Text.config(text=text_input)
+    Text.pack(side = BOTTOM)
+    Text.after(1000, add_text)
 
 m = Menu(root, tearoff=0)
 m.add_command(label="Settings", command=lambda: open_new_window())
@@ -177,6 +196,7 @@ m.add_command(label="Settings", command=lambda: open_new_window())
 m.add_command(label="Clock", command=lambda: turn_clock_on_if_can())
 m.add_command(label="Bigger", command=lambda: change_geoposition())
 m.add_command(label="Off top", command=lambda: switch_on_top())
+m.add_command(label="Font", command=lambda: change_font())
 m.add_command(label="Close", command=lambda: destroy())
 
 
@@ -260,10 +280,10 @@ def smaller():
     m.entryconfigure(2, label="Bigger")
     if not on_top_flag:
         switch_on_top()
-    font_size = 35
+    font_size = 37
     width_r = 40
     height_r = 15
-    Text.config(font=("Digital-7", int(font_size * 0.5)), width=width_r)
+    Text.config(font=('Berlin Sans FB', 17), width=width_r)
     reset_view()
     root.geometry(f'{root_width}x{root_height}+{center_x}+{center_y}')
     geo_flag = True
@@ -277,7 +297,7 @@ def bigger():
     font_size = 290
     width_r = 170
     height_r = 33
-    Text.config(font=("Digital-7", int(font_size * 0.5)), width=width_r)
+    Text.config(font=('Berlin Sans FB', 120), width=width_r)
     reset_view()
     root.geometry(
         f'{root_big_width}x{root_big_height}+{big_center_x}+{big_center_y}')
@@ -457,14 +477,6 @@ def get_timer_end_time():
         timer_end_time_list[0], timer_end_time_list[1], timer_end_time_list[2])
 
 
-def add_text():
-    text_input = txt.get().lstrip().rstrip()
-    log_txt(text_input)
-    Text.config(text=text_input)
-    Text.pack(side=BOTTOM)
-    Text.after(1000, add_text)
-
-
 def get_user_Input():
     try:
         h = hour.get()
@@ -564,6 +576,7 @@ open_alarm_label()
 open_cap_label()
 open_clock()
 add_text()
+change_geoposition()
 root.mainloop()
 
 
