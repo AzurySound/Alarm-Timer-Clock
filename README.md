@@ -1,7 +1,7 @@
 # Alarm-Timer-Clock
 ## Welcome to ATC!
 
-The product is aimed to be an effective widject for micro time management.
+The product is aimed to be an effective widject for self time micromanagement.
 There is a packed exe file available to download and run.
 
 The code is distributed between 3 .py files:
