@@ -5,7 +5,8 @@ from tkinter import (BOTTOM, DISABLED, NORMAL, Button, Entry, IntVar, Label,
 import WindowsTimer
 import Settings
 import logging
-
+import telegram
+import asyncio
 
 # import missd
 # to do list:
@@ -15,6 +16,8 @@ import logging
 last_click_x = 0
 last_click_y = 0
 update_window = 1000
+paused = False
+pause_tic = 0
 clock_flag = True
 alarm_flag = False
 timer_flag = False
@@ -25,22 +28,45 @@ on_top_flag = True
 font_size = 35
 width_r = 40
 height_r = 15
-font_names = ['Technology', 'FFF Forward']
+font_names = ['digital-7', 'FFF Forward']
 # ['open 24 Display St', 'digital-7','Technology', 'Fake Hope', 'Berlin Sans FB', 'FFF Forward']
 font_name = font_names[0]
-colors = ['#FFFFFF', '#44FF44','#FFFF88', '#444FFF', '#FF4444']
+fontNum = font_names.index(font_name)
+colors = ['#FFFFFF', '#44FF44', '#FFFF88', '#444FFF', '#FF4444']
 color = colors[0]
+colorNum = colors.index(color)
 transparencies = [0.1, 0.3, 0.5, 0.7, 1]
 transparency = transparencies[1]
 timer_end_time = []
 start_time = []
 txt_log_var = ''
+tgbot='5472804874:AAEGGYjTenN7Tbkrr1rroPO_bibtdIY5YKk'
 
+# async def get_chat_id(username):
+#     bot = telegram.Bot(token=tgbot)
+#     try:
+#         user = await bot.get_chat(username)
+#         return user.id
+#     except telegram.error.BadRequest:
+#         print(f"user not found: {username}")
 
+# un = "@Yolokid"
+# chat_id = asyncio.run(get_chat_id(un))
+# if chat_id:
+#     print("Chat ID:", chat_id)
 
+with open('./tg_user_id.txt', 'r') as file:
+    userid = file.readline()
+
+async def send_telegram_message(text):
+    bot = telegram.Bot(token=tgbot)
+    chat_id = userid #259990327
+    await bot.send_message(chat_id=chat_id, text=text)
 # missd.sendMessage()
 
 
+
+ 
 def save_last_click_pos(event):
     global last_click_x, last_click_y
     last_click_x = event.x
@@ -120,21 +146,22 @@ def switch_transparency():
 
 
 def change_color():
-    global color
-    colorNum = colors.index(color)
+    if paused:
+        return
+    global color, colorNum
     colorNum += 1
     if colorNum == len(colors):
         colorNum = 0
     color = colors[colorNum]
     reset_view()
 
+
 def change_font():
-    global font_name
-    colorNum = font_names.index(font_name)
-    colorNum += 1
-    if colorNum == len(font_names):
-        colorNum = 0
-    font_name = font_names[colorNum]
+    global font_name, fontNum
+    fontNum += 1
+    if fontNum == len(font_names):
+        fontNum = 0
+    font_name = font_names[fontNum]
     reset_view()
 
 
@@ -175,11 +202,13 @@ def open_clock_label():
 def open_cap_label():
     switch_cap()
     global Cap, font_size
-    Cap = Label(root, font=(font_name, font_size), fg='#000',bg='#FFF', width=width_r, height=height_r)
+    Cap = Label(root, font=(font_name, font_size), fg='#000',
+                bg='#FFF', width=width_r, height=height_r)
     Cap.bind("<Button-3>", do_popup)
 
+
 Text = Label(root, font=('Berlin Sans FB', int(font_size * 0.4)),
-            text=txt.get().lstrip().rstrip(), fg=color, bg='#add123', width=width_r)
+             text=txt.get().lstrip().rstrip(), fg=color, bg='#add123', width=width_r)
 Text.bind("<Button-3>", do_popup)
 
 
@@ -187,17 +216,36 @@ def add_text():
     text_input = txt.get().lstrip().rstrip()
     log_txt(text_input)
     Text.config(text=text_input)
-    Text.pack(side = BOTTOM)
+    Text.pack(side=BOTTOM)
     Text.after(1000, add_text)
+
 
 m = Menu(root, tearoff=0)
 m.add_command(label="Settings", command=lambda: open_new_window())
-# m.add_command(label="Stopwatch", command=lambda: turn_on_stopwatch_if_can())
+m.add_command(label="Freeze", command=lambda: change_pause_mode())
 m.add_command(label="Clock", command=lambda: turn_clock_on_if_can())
 m.add_command(label="Bigger", command=lambda: change_geoposition())
 m.add_command(label="Off top", command=lambda: switch_on_top())
 m.add_command(label="Font", command=lambda: change_font())
 m.add_command(label="Close", command=lambda: destroy())
+
+
+def change_pause_mode():
+    global paused, pause_tic, font_name, color
+    if paused:
+        paused = False
+        # font_name = font_names[fontNum]
+        color = colors[colorNum]
+        m.entryconfigure(1, label="Freeze", font= 'Arial 9')
+        logging.info('Paused DEACTIVATED')
+    else:
+        paused = True
+        # font_name = 'ice sticks'
+        color = '#2eaeff'
+        m.entryconfigure(1, label="Unfreeze", font= 'Arial 9 bold')
+        logging.info('Paused ACTIVATED')
+    reset_view()
+    logging.info('Pause changes has been applied')
 
 
 def destroy():
@@ -225,11 +273,11 @@ def switch_on_top():
     global on_top_flag
     if not on_top_flag:
         root.attributes('-topmost', True)
-        m.entryconfigure(3, label="Off top")
+        m.entryconfigure(4, label="Off top")
         on_top_flag = True
     else:
         root.attributes('-topmost', False)
-        m.entryconfigure(3, label="On top")
+        m.entryconfigure(4, label="On top")
         on_top_flag = False
 
 
@@ -277,7 +325,7 @@ def reset_view():
 
 def smaller():
     global geo_flag, font_size, width_r, height_r
-    m.entryconfigure(2, label="Bigger")
+    m.entryconfigure(3, label="Bigger")
     if not on_top_flag:
         switch_on_top()
     font_size = 37
@@ -291,7 +339,7 @@ def smaller():
 
 def bigger():
     global geo_flag, font_size, width_r, height_r
-    m.entryconfigure(2, label="Smaller")
+    m.entryconfigure(3, label="Smaller")
     if on_top_flag:
         switch_on_top()
     font_size = 290
@@ -320,12 +368,17 @@ def open_error():
 
 def open_cap():
     try:
+        global pause_tic, paused
+        if paused:
+            change_pause_mode()
         Timer.destroy()
         Alarm.destroy()
         # Stopwatch.destroy()
         open_cap_label()
         Cap.pack()
         run_cap()
+        note = " " + txt.get().lstrip().rstrip()
+        asyncio.run(send_telegram_message("Time's up" + note))
     except Exception as e:
         logging.error(e)
         open_error()
@@ -333,6 +386,10 @@ def open_cap():
 
 def open_clock():
     try:
+        global pause_tic, paused
+        pause_tic = 0
+        if paused:
+            change_pause_mode()
         Timer.destroy()
         Alarm.destroy()
         Cap.destroy()
@@ -347,6 +404,11 @@ def open_clock():
 
 def open_alarm():
     try:
+        global pause_tic, paused
+        pause_tic = 0
+        if paused:
+            change_pause_mode()
+        get_timer_end_time()
         open_alarm_label()
         Timer.destroy()
         Clock.destroy()
@@ -361,6 +423,10 @@ def open_alarm():
 
 def open_timer():
     try:
+        global pause_tic, paused
+        pause_tic = 0
+        if paused:
+            change_pause_mode()
         get_timer_end_time()
         open_timer_label()
         Clock.destroy()
@@ -412,9 +478,11 @@ def switch_cap():
 
 
 def open_new_window():
-
+    if paused:
+        return
+        
     def btn_set():
-
+    
         if clock_flag:
             clockBtn['state'] = DISABLED
             alarmBtn['state'] = NORMAL
@@ -516,10 +584,14 @@ def run_cap():
 
 
 def run_alarm():
+    global pause_tic
     try:
         hms = get_user_Input()
+        if paused:
+            pause_tic += 1
+            logging.info(f'pause_tic = {pause_tic}')
         text_input = WindowsTimer.get_countdown(
-            hms[0], hms[1], hms[2])
+            hms[0], hms[1], hms[2] + pause_tic)
         Alarm.config(text=text_input)
         Alarm.after(update_window, run_alarm)
         if text_input == 'finished':
@@ -530,16 +602,19 @@ def run_alarm():
 
 
 def run_timer():
+    global pause_tic
     try:
         user_input = get_user_Input()
+        if paused:
+            pause_tic += 1
+            logging.info(f'pause_tic = {pause_tic}')
 
         if user_input == (0, 0, 0):
             text_input = WindowsTimer.stopwatch(
-                timer_end_time[0], timer_end_time[1], timer_end_time[2])
+                timer_end_time[0], timer_end_time[1], timer_end_time[2] + pause_tic)
         else:
             text_input = WindowsTimer.get_countdown(
-                timer_end_time[0], timer_end_time[1], timer_end_time[2])
-
+                timer_end_time[0], timer_end_time[1], timer_end_time[2] + pause_tic)
         Timer.config(text=text_input)
         Timer.after(update_window, run_timer)
         if text_input == 'finished':  # or sum(hms) == 0:

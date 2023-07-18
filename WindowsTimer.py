@@ -7,13 +7,14 @@ logging.basicConfig(filename='ATC.log', level=logging.INFO,
                     style='{')
 
 finished = False
+paused = False
 
 
 def add_current_time_to(h, m, s):
 
-    hours = ClockHand(24, time.localtime().tm_hour)
-    minutes = ClockHand(60, time.localtime().tm_min)
     seconds = ClockHand(60, time.localtime().tm_sec)
+    minutes = ClockHand(60, time.localtime().tm_min)
+    hours = ClockHand(24, time.localtime().tm_hour)
 
     advanced_sec = s
     advanced_min = m + seconds.extra_value(s)
@@ -31,9 +32,9 @@ def add_current_time_to(h, m, s):
     if h == 0 and m == 0:
         extra_second = 0
 
-    hour = hours.get_value()
-    min = minutes.get_value()
     sec = seconds.get_value() - extra_second
+    min = minutes.get_value()
+    hour = hours.get_value()
 
     if sec < 0:
         sec = 0
@@ -47,9 +48,26 @@ def add_current_time_to(h, m, s):
 
 
 def time_diff(h, m, s, h2, m2, s2):
-    hours = ClockHand(24, h)
-    minutes = ClockHand(60, m)
-    seconds = ClockHand(60, s)
+    # case when s > 59 is for paused mode when sum of (received seconds + pause_tics) is higher than limit
+    if s > 59:
+        seconds = ClockHand(60, 0)
+        minutes = ClockHand(60, 0)
+        hours = ClockHand(24, 0)
+
+        advanced_sec = s
+        advanced_min = m + seconds.extra_value(s)
+        advanced_hour = h + minutes.extra_value(m)
+
+        seconds.advance(advanced_sec)
+        minutes.advance(advanced_min)
+        hours.advance(advanced_hour)
+        logging.info('\nTime End: "{}:{}:{}"'.format(hours, minutes, seconds))
+    # normal case when we work with pause_tics == 0 can be addressed in a simpler way:
+    else:
+        seconds = ClockHand(60, s)
+        minutes = ClockHand(60, m)
+        hours = ClockHand(24, h)
+
     withdrawed_sec = s2
     withdrawed_min = m2 + seconds.extra_minus(s2)
     withdrawed_hour = h2 + \
@@ -89,6 +107,7 @@ def get_countdown(h, m, s):
 
     if finished:
         return 'finished'
+    
 
     hours = ClockHand(24, view[0])
     minutes = ClockHand(60, view[1])
@@ -100,11 +119,13 @@ def get_countdown(h, m, s):
     if hours.get_value() == 0:
         if view[2] < 6 or view[2] > 54:
             logging.info('Output time: "{}:{}"'.format(minutes, view[2]))
-        return (f'{minutes.get_value()}')
+        return (f'{minutes.get_value()}') # prod
+        return (f'{minutes.get_value()}:{view[2]}') # test
 
     if view[2] < 6 or view[2] > 54:
         logging.info('Output time: "{}:{}:{}"'.format(hours, minutes, view[2]))
-    return (f'{hours.get_value()}:{minutes}')
+    return (f'{hours.get_value()}:{minutes}') # prod
+    return (f'{hours.get_value()}:{minutes}:{view[2]}') # test
 
 
 def stopwatch(h, m, s):
@@ -116,7 +137,8 @@ def stopwatch(h, m, s):
     if timer[0] == 0:
         if timer[2] < 6 or timer[2] > 54:
             logging.info('Output time: "{}:{}"'.format(timer[1], timer[2]))
-        return (f'{minutes.get_value()}')
+        return (f'{minutes.get_value()}') # prod
+        return (f'{minutes.get_value()}:{timer[2]}') # test
 
     if timer[2] < 6 or timer[2] > 54:
         logging.info('Output time: "{}:{}:{}"'.format(timer[0], timer[1], timer[2]))
